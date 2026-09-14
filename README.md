@@ -63,7 +63,7 @@ Generate the SSH key pair as the `ansible` user on the master and each worker:
 ssh-keygen -t ed25519
 ```
 
-![User creation, sudo access, and SSH keygen on master, a-01, and a-02](./images/01-user-sudo-ssh-keygen.jpg)
+![User creation, sudo access, and SSH keygen on master, a-01, and a-02](./images/01-user-sudo-ssh-keygen.png)
 
 ### 2. Verify the sudoers entry
 
