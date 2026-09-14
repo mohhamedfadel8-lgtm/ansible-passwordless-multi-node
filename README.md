@@ -67,4 +67,106 @@ ssh-keygen -t ed25519
 
 ### 2. Verify the sudoers entry
 
-Confirming the `ansible ALL=(ALL) NOPASSWD: ALL` line landed correctly in `/etc/sudoers` on the master and both
+Confirming the `ansible ALL=(ALL) NOPASSWD: ALL` line landed correctly in `/etc/sudoers` on the master and both workers:
+
+![Sudoers file configuration on master and workers](./images/02-sudoers-config.jpg)
+
+### 3. Copy the public key to both Workers and verify passwordless SSH
+
+```bash
+ssh-copy-id ansible@<WORKER_1_IP>
+ssh-copy-id ansible@<WORKER_2_IP>
+
+# verify
+ssh ansible@<WORKER_1_IP>
+exit
+ssh ansible@<WORKER_2_IP>
+exit
+```
+
+![ssh-copy-id and passwordless SSH verification](./images/04-ssh-copy-id-and-passwordless-verify.jpg)
+
+### 4. Confirm the public key landed in `authorized_keys` on both Workers
+
+```bash
+cd ~/.ssh
+ls
+cat authorized_keys
+```
+
+![authorized_keys confirmed on a-01 and a-02](./images/03-authorized-keys-workers.jpg)
+
+### 5. Create the inventory file on the Master
+
+```bash
+mkdir -p ~/ansible
+cd ~/ansible
+vi inventory
+```
+
+See [`inventory`](./inventory) for the file contents.
+
+---
+
+## ✅ Validation
+
+Run:
+
+```bash
+ansible all -i inventory -m ping
+```
+
+**Expected result:**
+
+```
+worker-01 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+worker-02 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
+
+This confirms the Master can reach and authenticate with both Workers over SSH without a password, and that Ansible can successfully execute modules against them.
+
+![Inventory file contents and final ansible ping validation](./images/05-inventory-and-ping-validation.jpg)
+
+---
+
+## 📂 Repository Structure
+
+```
+.
+├── README.md
+├── inventory
+└── images/
+    ├── 01-user-sudo-ssh-keygen.jpg
+    ├── 02-sudoers-config.jpg
+    ├── 03-authorized-keys-workers.jpg
+    ├── 04-ssh-copy-id-and-passwordless-verify.jpg
+    └── 05-inventory-and-ping-validation.jpg
+```
+
+---
+
+## 🛠️ Tools & Technologies
+
+- Ansible (installed via `pip`)
+- SSH key-based authentication (`ed25519`)
+- Linux user & sudo management
+
+---
+
+## 📝 Notes
+
+- The `ansible` user was created with a password on every node (Master and both Workers) to satisfy the sudo/user requirements, but day-to-day access from the Master to the Workers relies entirely on the SSH key pair — no password is ever entered during that connection.
+- The first `ssh-copy-id` attempt to worker-02 hit a few `Permission denied` retries before succeeding — a common hiccup when the target's SSH service hasn't fully settled or the password is mistyped; retrying with the correct password resolved it.
+- IP addresses in this write-up (`192.168.148.130`, `192.168.148.134`) come directly from the lab environment; replace them with your actual worker IPs when reproducing the setup.
