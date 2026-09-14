@@ -69,7 +69,7 @@ ssh-keygen -t ed25519
 
 Confirming the `ansible ALL=(ALL) NOPASSWD: ALL` line landed correctly in `/etc/sudoers` on the master and both workers:
 
-![Sudoers file configuration on master and workers](./images/02-sudoers-config.jpg)
+![Sudoers file configuration on master and workers](./images/02-sudoers-config.png)
 
 ### 3. Copy the public key to both Workers and verify passwordless SSH
 
@@ -84,7 +84,7 @@ ssh ansible@<WORKER_2_IP>
 exit
 ```
 
-![ssh-copy-id and passwordless SSH verification](./images/04-ssh-copy-id-and-passwordless-verify.jpg)
+![ssh-copy-id and passwordless SSH verification](./images/04-ssh-copy-id-and-passwordless-verify.png)
 
 ### 4. Confirm the public key landed in `authorized_keys` on both Workers
 
@@ -94,7 +94,7 @@ ls
 cat authorized_keys
 ```
 
-![authorized_keys confirmed on a-01 and a-02](./images/03-authorized-keys-workers.jpg)
+![authorized_keys confirmed on a-01 and a-02](./images/03-authorized-keys-workers.png)
 
 ### 5. Create the inventory file on the Master
 
@@ -137,7 +137,7 @@ worker-02 | SUCCESS => {
 
 This confirms the Master can reach and authenticate with both Workers over SSH without a password, and that Ansible can successfully execute modules against them.
 
-![Inventory file contents and final ansible ping validation](./images/05-inventory-and-ping-validation.jpg)
+![Inventory file contents and final ansible ping validation](./images/05-inventory-and-ping-validation.png)
 
 ---
 
